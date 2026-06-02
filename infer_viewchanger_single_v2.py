@@ -77,7 +77,7 @@ import imageio.v2 as imageio
 
 
 import argparse
-
+import time
 
 from moge.model import import_model_class_by_version
 
@@ -481,13 +481,17 @@ for image_path in image_paths:
     with autocast_ctx:
         input_image = masked_image
         _, _, height, width = input_image.shape
+        start_time = time.time()
         image = pipe(
             image = input_image, height=height, width=width,
             prompt="Ensure that the picture does not change in any way",
             # guidance_scale=,
             input_img_ids = pix_coords_downs,
-            use_multi_scale_position = True
+            use_multi_scale_position = True,
+            num_inference_steps=10
         ).images[0]
+        step_time = time.time() - start_time
+        print(f"Cost time is {step_time}")
         image.save(os.path.join(output_dir, f"{base_name}_output.png"))
     
     
